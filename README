@@ -9,6 +9,11 @@
 3. 功能建议和综合讨论，请访问MiCode,
    http://micode.net/forum.php?mod=forumdisplay&fid=38
 
+4. 小米便签是由java和kotlin混合编写的Android项目，所以需要装java（+JDK，java的运行环境）,kotlin,Android的插件，这里前两者的插件在vscode内部就可以找到，Android（提供项目语法支持）的扩展及Android studio（安卓软件开发工具包）需要自己去外部网站下载，下好之后代码中提到的Android部分就不会爆红了
+   https://developer.android.com/studio
+
+5..idea文件是配置文件，res是资源文件夹（所有界面、颜色、图标、文字），src是Java/Kotlin源代码文件夹，build.gradle是项目构建文件夹（以来库、编译版本等）
+
 
 [English]
 

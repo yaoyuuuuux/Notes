@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!-- Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,22 +21,21 @@
 
     <uses-sdk android:minSdkVersion="14" />
 
+    <!-- 以下为保留的 非特权、非废弃、必需权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- 已移除：READ_CONTACTS、MANAGE_ACCOUNTS、AUTHENTICATE_ACCOUNTS、GET_ACCOUNTS、USE_CREDENTIALS -->
+
     <application
-        android:icon="@drawable/icon_app"
+        android:icon="@drawable/bg_btn_set_color"
         android:label="@string/app_name" >
         <activity
             android:name=".ui.NotesListActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/NoteTheme"
@@ -53,6 +51,7 @@
         <activity
             android:name=".ui.NoteEditActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/NoteTheme" >
 
@@ -83,10 +82,12 @@
         <provider
             android:name="net.micode.notes.data.NotesProvider"
             android:authorities="micode_notes"
+            android:exported="false"
             android:multiprocess="true" />
 
         <receiver
             android:name=".widget.NoteWidgetProvider_2x"
+            android:exported="true"
             android:label="@string/app_widget2x2" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -98,8 +99,10 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_2x_info" />
         </receiver>
+
         <receiver
             android:name=".widget.NoteWidgetProvider_4x"
+            android:exported="true"
             android:label="@string/app_widget4x4" >
 
             <intent-filter>
@@ -113,7 +116,9 @@
                 android:resource="@xml/widget_4x_info" />
         </receiver>
 
-        <receiver android:name=".ui.AlarmInitReceiver" >
+        <receiver
+            android:name=".ui.AlarmInitReceiver"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -121,11 +126,13 @@
 
         <receiver
             android:name="net.micode.notes.ui.AlarmReceiver"
+            android:exported="false"
             android:process=":remote" >
         </receiver>
 
         <activity
             android:name=".ui.AlarmAlertActivity"
+            android:exported="false"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Holo.Wallpaper.NoTitleBar" >
@@ -133,6 +140,7 @@
 
         <activity
             android:name="net.micode.notes.ui.NotesPreferenceActivity"
+            android:exported="false"
             android:label="@string/preferences_title"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.Holo.Light" >

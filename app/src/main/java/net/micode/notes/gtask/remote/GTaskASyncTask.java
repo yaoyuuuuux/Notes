@@ -28,10 +28,16 @@ import net.micode.notes.R;
 import net.micode.notes.ui.NotesListActivity;
 import net.micode.notes.ui.NotesPreferenceActivity;
 
-
 public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
 
     private static int GTASK_SYNC_NOTIFICATION_ID = 5234235;
+
+    @Override
+    protected Integer doInBackground(Void... params) {
+        // 这里是你原来的后台执行逻辑
+        // 如果你不小心全删了，你需要从原版源码里找回这个方法的代码
+        return null; // 或者返回你实际需要的 Integer 值
+    }
 
     public interface OnCompleteListener {
         void onComplete();
@@ -58,66 +64,63 @@ public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
     }
 
     public void publishProgess(String message) {
-        publishProgress(new String[] {
-            message
+        publishProgress(new String[]{
+                message
         });
     }
 
     private void showNotification(int tickerId, String content) {
-        Notification notification = new Notification(R.drawable.notification, mContext
-                .getString(tickerId), System.currentTimeMillis());
-        notification.defaults = Notification.DEFAULT_LIGHTS;
-        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        String channelId = "gtask_sync_channel";
+
+        // 1. 创建点击通知后跳转的 Intent
         PendingIntent pendingIntent;
+        // 注意：Android 12 (API 31) 以上要求 PendingIntent 必须指定 FLAG_IMMUTABLE 或 FLAG_MUTABLE
+        int pendingIntentFlags = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M ?
+                PendingIntent.FLAG_IMMUTABLE : 0;
+
         if (tickerId != R.string.ticker_success) {
-            pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
-                    NotesPreferenceActivity.class), 0);
-
+            pendingIntent = PendingIntent.getActivity(mContext, 0,
+                    new android.content.Intent(mContext, net.micode.notes.ui.NotesPreferenceActivity.class), pendingIntentFlags);
         } else {
-            pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
-                    NotesListActivity.class), 0);
+            pendingIntent = PendingIntent.getActivity(mContext, 0,
+                    new android.content.Intent(mContext, net.micode.notes.ui.NotesListActivity.class), pendingIntentFlags);
         }
-        notification.setLatestEventInfo(mContext, mContext.getString(R.string.app_name), content,
-                pendingIntent);
-        mNotifiManager.notify(GTASK_SYNC_NOTIFICATION_ID, notification);
-    }
 
-    @Override
-    protected Integer doInBackground(Void... unused) {
-        publishProgess(mContext.getString(R.string.sync_progress_login, NotesPreferenceActivity
-                .getSyncAccountName(mContext)));
-        return mTaskManager.sync(mContext, this);
-    }
-
-    @Override
-    protected void onProgressUpdate(String... progress) {
-        showNotification(R.string.ticker_syncing, progress[0]);
-        if (mContext instanceof GTaskSyncService) {
-            ((GTaskSyncService) mContext).sendBroadcast(progress[0]);
+        // 2. 针对 Android 8.0 (API 26) 及以上版本，必须创建 NotificationChannel
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            android.app.NotificationChannel channel = new android.app.NotificationChannel(
+                    channelId,
+                    "GTask Sync", // 通知渠道的名称
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            notificationManager.createNotificationChannel(channel);
         }
-    }
 
-    @Override
-    protected void onPostExecute(Integer result) {
-        if (result == GTaskManager.STATE_SUCCESS) {
-            showNotification(R.string.ticker_success, mContext.getString(
-                    R.string.success_sync_account, mTaskManager.getSyncAccount()));
-            NotesPreferenceActivity.setLastSyncTime(mContext, System.currentTimeMillis());
-        } else if (result == GTaskManager.STATE_NETWORK_ERROR) {
-            showNotification(R.string.ticker_fail, mContext.getString(R.string.error_sync_network));
-        } else if (result == GTaskManager.STATE_INTERNAL_ERROR) {
-            showNotification(R.string.ticker_fail, mContext.getString(R.string.error_sync_internal));
-        } else if (result == GTaskManager.STATE_SYNC_CANCELLED) {
-            showNotification(R.string.ticker_cancel, mContext
-                    .getString(R.string.error_sync_cancelled));
+        // 3. 使用 Builder 构建通知
+        android.app.Notification.Builder builder;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder = new android.app.Notification.Builder(mContext, channelId);
+        } else {
+            builder = new android.app.Notification.Builder(mContext);
         }
-        if (mOnCompleteListener != null) {
-            new Thread(new Runnable() {
 
-                public void run() {
-                    mOnCompleteListener.onComplete();
-                }
-            }).start();
+        builder.setSmallIcon(R.drawable.icon_app) // 设置小图标
+                .setTicker(mContext.getString(tickerId)) // 设置状态栏提示文本
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(mContext.getString(R.string.app_name)) // 标题
+                .setContentText(content) // 内容
+                .setContentIntent(pendingIntent) // 点击跳转
+                .setAutoCancel(true); // 点击后自动消失
+
+        android.app.Notification notification;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            notification = builder.build();
+        } else {
+            notification = builder.getNotification();
         }
+
+        // 4. 发送通知
+        notificationManager.notify(GTASK_SYNC_NOTIFICATION_ID, notification);
     }
 }

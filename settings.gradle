@@ -1,0 +1,3 @@
+rootProject.name = 'Notes'
+include ':app'
+//这个文件夹定义了项目名称和包含的模块（这里默认名为app）
