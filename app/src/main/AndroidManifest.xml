@@ -18,17 +18,21 @@
     package="net.micode.notes"
     android:versionCode="1"
     android:versionName="0.1" >
-
     <uses-sdk android:minSdkVersion="14" />
 
     <!-- 以下为保留的 非特权、非废弃、必需权限 -->
+    <!-- 读写存储：备份/导入 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 创建快捷方式权限 -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <!-- 网络权限：同步用 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 开机广播：重启后恢复提醒 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- 已移除：READ_CONTACTS、MANAGE_ACCOUNTS、AUTHENTICATE_ACCOUNTS、GET_ACCOUNTS、USE_CREDENTIALS -->
-
+<!-- 全局 application ,无自定义Application类 -->
     <application
         android:icon="@drawable/bg_btn_set_color"
         android:label="@string/app_name" >

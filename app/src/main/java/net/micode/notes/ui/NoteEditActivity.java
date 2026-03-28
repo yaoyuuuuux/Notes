@@ -16,6 +16,7 @@
 
 package net.micode.notes.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -73,7 +74,7 @@ import java.util.regex.Pattern;
 
 
 public class NoteEditActivity extends Activity implements OnClickListener,
-        NoteSettingChangedListener, OnTextViewChangeListener {
+        NoteSettingChangedListener, OnTextViewChangeListener { //
     private class HeadViewHolder {
         public TextView tvModified;
 
@@ -144,7 +145,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     public static final String TAG_CHECKED = String.valueOf('\u221A');
     public static final String TAG_UNCHECKED = String.valueOf('\u25A1');
 
-    private LinearLayout mEditTextList;
+    private LinearLayout mEditTextList;  /*该代码片段（第123-147行）声明了类的成员变量，用于管理UI组件、笔记数据、用户偏好以及与字体大小和检查列表状态相关的常量。*/
 
     private String mUserQuery;
     private Pattern mPattern;
@@ -425,12 +426,13 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         setResult(RESULT_OK, intent);
     }
 
+    @SuppressLint("WrongConstant")
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_set_bg_color) {
             mNoteBgColorSelector.setVisibility(View.VISIBLE);
             findViewById(sBgSelectorSelectionMap.get(mWorkingNote.getBgColorId())).setVisibility(
-                    -                    View.VISIBLE);
+                    View.VISIBLE);
         } else if (sBgSelectorBtnsMap.containsKey(id)) {
             findViewById(sBgSelectorSelectionMap.get(mWorkingNote.getBgColorId())).setVisibility(
                     View.GONE);

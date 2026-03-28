@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+//Android 四大组件之一。它像一个窗口，所有的增删改查（CRUD）请求都通过它转发给数据库，保证了数据的安全性。
 package net.micode.notes.data;
 
 
@@ -34,11 +34,11 @@ import net.micode.notes.data.Notes.DataColumns;
 import net.micode.notes.data.Notes.NoteColumns;
 import net.micode.notes.data.NotesDatabaseHelper.TABLE;
 
-
+//核心逻辑：增删改查的具体实现
 public class NotesProvider extends ContentProvider {
     private static final UriMatcher mMatcher;
 
-    private NotesDatabaseHelper mHelper;
+    private NotesDatabaseHelper mHelper;//内部持有数据库助手对象
 
     private static final String TAG = "NotesProvider";
 
@@ -73,7 +73,7 @@ public class NotesProvider extends ContentProvider {
         + "'" + Intent.ACTION_VIEW + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_ACTION + ","
         + "'" + Notes.TextNote.CONTENT_TYPE + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA;
 
-    private static String NOTES_SNIPPET_SEARCH_QUERY = "SELECT " + NOTES_SEARCH_PROJECTION
+    private static final String NOTES_SNIPPET_SEARCH_QUERY = "SELECT " + NOTES_SEARCH_PROJECTION
         + " FROM " + TABLE.NOTE
         + " WHERE " + NoteColumns.SNIPPET + " LIKE ?"
         + " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER
@@ -89,7 +89,7 @@ public class NotesProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         Cursor c = null;
-        SQLiteDatabase db = mHelper.getReadableDatabase();
+        SQLiteDatabase db = mHelper.getReadableDatabase();//获取只读权限
         String id = null;
         switch (mMatcher.match(uri)) {
             case URI_NOTE:
@@ -135,7 +135,8 @@ public class NotesProvider extends ContentProvider {
                     c = db.rawQuery(NOTES_SNIPPET_SEARCH_QUERY,
                             new String[] { searchString });
                 } catch (IllegalStateException ex) {
-                    Log.e(TAG, "got exception: " + ex.toString());
+                    //ex.toString()本身是字符串，直接拼接时无需显式调用
+                    Log.e(TAG, "got exception: " + ex);
                 }
                 break;
             default:
@@ -149,11 +150,11 @@ public class NotesProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
+        SQLiteDatabase db = mHelper.getWritableDatabase();//获取写入权限
         long dataId = 0, noteId = 0, insertedId = 0;
         switch (mMatcher.match(uri)) {
             case URI_NOTE:
-                insertedId = noteId = db.insert(TABLE.NOTE, null, values);
+                insertedId = noteId = db.insert(TABLE.NOTE, null, values);//插入数据
                 break;
             case URI_DATA:
                 if (values.containsKey(DataColumns.NOTE_ID)) {
@@ -168,13 +169,13 @@ public class NotesProvider extends ContentProvider {
         }
         // Notify the note uri
         if (noteId > 0) {
-            getContext().getContentResolver().notifyChange(
+            getContext().getContentResolver().notifyChange( //插入成功后通知页面刷新
                     ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId), null);
         }
 
         // Notify the data uri
         if (dataId > 0) {
-            getContext().getContentResolver().notifyChange(
+            getContext().getContentResolver().notifyChange( //插入成功后通知页面刷新
                     ContentUris.withAppendedId(Notes.CONTENT_DATA_URI, dataId), null);
         }
 

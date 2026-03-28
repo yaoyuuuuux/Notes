@@ -13,17 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ /*可以把这个 Notes.java 文件想象成一个表格的模板设计图：
+Notes 类：就像是整个“便签管理系统”。
+DataColumns 接口：就像是其中一张叫“细节表”的列名定义。
+DATA1, DATA2, DATA3：你可以理解为桌子上的“抽屉 1”、“抽屉 2”、“抽屉 3”。
+如果你往桌子上放一盏台灯（MIMETYPE = 台灯），那么“抽屉 1”里可能放的是“灯泡功率”。
+如果你往桌子上放一个书架（MIMETYPE = 书架），那么“抽屉 1”里可能放的是“书籍数量”。
+这种设计叫“通用表结构”，在 Android 系统（如联系人应用）中非常常见，初学者理解了这个，对以后看大型 Android 源码非常有帮助。
+ */
 
 package net.micode.notes.data;
 
 import android.net.Uri;
+
+//这是数据的“契约类”，定义了数据库长什么样
+
 public class Notes {
-    public static final String AUTHORITY = "micode_notes";
+    public static final String AUTHORITY = "micode_notes";//唯一的标识符，用于跨应用访问数据
     public static final String TAG = "Notes";
     public static final int TYPE_NOTE     = 0;
     public static final int TYPE_FOLDER   = 1;
     public static final int TYPE_SYSTEM   = 2;
-
+//{@link #xxx}这类注释在java中表示“链接到名为xxx的变量”.
     /**
      * Following IDs are system folders' identifiers
      * {@link Notes#ID_ROOT_FOLDER } is default folder
@@ -60,185 +71,87 @@ public class Notes {
      * Uri to query data
      */
     public static final Uri CONTENT_DATA_URI = Uri.parse("content://" + AUTHORITY + "/data");
-
+//定义便签内容的列名
     public interface NoteColumns {
-        /**
-         * The unique ID for a row
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String ID = "_id";
 
-        /**
-         * The parent's id for note or folder
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String PARENT_ID = "parent_id";
+        //在接口中，字段、成员默认是public、static、final的，所以显式里不用再强调 public static final 了
 
-        /**
-         * Created data for note or folder
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String CREATED_DATE = "created_date";
-
-        /**
-         * Latest modified date
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String MODIFIED_DATE = "modified_date";
-
-
-        /**
-         * Alert date
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String ALERTED_DATE = "alert_date";
-
-        /**
-         * Folder's name or text content of note
-         * <P> Type: TEXT </P>
-         */
-        public static final String SNIPPET = "snippet";
-
-        /**
-         * Note's widget id
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String WIDGET_ID = "widget_id";
-
-        /**
-         * Note's widget type
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String WIDGET_TYPE = "widget_type";
-
-        /**
-         * Note's background color's id
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String BG_COLOR_ID = "bg_color_id";
-
-        /**
-         * For text note, it doesn't has attachment, for multi-media
-         * note, it has at least one attachment
-         * <P> Type: INTEGER </P>
-         */
-        public static final String HAS_ATTACHMENT = "has_attachment";
-
-        /**
-         * Folder's count of notes
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String NOTES_COUNT = "notes_count";
-
-        /**
-         * The file type: folder or note
-         * <P> Type: INTEGER </P>
-         */
-        public static final String TYPE = "type";
-
-        /**
-         * The last sync id
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String SYNC_ID = "sync_id";
-
-        /**
-         * Sign to indicate local modified or not
-         * <P> Type: INTEGER </P>
-         */
-        public static final String LOCAL_MODIFIED = "local_modified";
-
-        /**
-         * Original parent id before moving into temporary folder
-         * <P> Type : INTEGER </P>
-         */
-        public static final String ORIGIN_PARENT_ID = "origin_parent_id";
-
-        /**
-         * The gtask id
-         * <P> Type : TEXT </P>
-         */
-        public static final String GTASK_ID = "gtask_id";
-
-        /**
-         * The version code
-         * <P> Type : INTEGER (long) </P>
-         */
-        public static final String VERSION = "version";
+        String ID = "_id";//每条便签的唯一ID
+        String PARENT_ID = "parent_id";//所属文件夹的ID
+        String CREATED_DATE = "created_date";//创建时间
+        String MODIFIED_DATE = "modified_date";//最后修改时间
+        String ALERTED_DATE = "alert_date";
+        String SNIPPET = "snippet";
+        String WIDGET_ID = "widget_id"; //桌面小部件的关联ID
+        String WIDGET_TYPE = "widget_type"; //小部件类型
+        String BG_COLOR_ID = "bg_color_id";
+        String HAS_ATTACHMENT = "has_attachment";
+        String NOTES_COUNT = "notes_count";
+        String TYPE = "type"; //类型；是普通便签还是文件夹
+        String SYNC_ID = "sync_id";
+        String LOCAL_MODIFIED = "local_modified";
+        String ORIGIN_PARENT_ID = "origin_parent_id";
+        String GTASK_ID = "gtask_id";
+        String VERSION = "version";
     }
 
+    //这是Notes类内部的一个接口，专门定义“扩展数据表”的列名
+
     public interface DataColumns {
-        /**
-         * The unique ID for a row
-         * <P> Type: INTEGER (long) </P>
-         */
-        public static final String ID = "_id";
 
         /**
-         * The MIME type of the item represented by this row.
-         * <P> Type: Text </P>
+         * MIMETYPE: 数据的类型。
+         * 比如：这条数据是一个“闹钟”还是一个“文本内容”。
+         * 这个字段非常重要，决定了后面 DATA1, DATA2 存的是什么。
          */
-        public static final String MIME_TYPE = "mime_type";
+        String MIME_TYPE = "mime_type";//定义数据类型
+        /*
+        IDE（编辑器）发现你的 DataColumns
+        接口里没有定义 MIMETYPE 这个常量，所以它找不到目标，就标红报错了。
+        */
 
         /**
-         * The reference id to note that this data belongs to
-         * <P> Type: INTEGER (long) </P>
+         * ID:数据的唯一标识（通常是自增数字）
          */
-        public static final String NOTE_ID = "note_id";
+        String ID = "_id";
 
         /**
-         * Created data for note or folder
-         * <P> Type: INTEGER (long) </P>
+         * NOTE_ID: 关联的主便签 ID。
+         * 表示这条扩展数据是属于哪一页便签的。
          */
-        public static final String CREATED_DATE = "created_date";
+        String NOTE_ID = "note_id";
+
+        // --- 下面是通用数据列 (Generic Data Columns) ---
+        // 为什么要叫 DATA1, DATA2？
+        // 因为这张表要存很多种数据，为了省事，定义了几个通用的格子，
+        // 如果是闹钟，DATA1 可能存时间；如果是清单，DATA1 可能存文字。
+        String CONTENT = "content";
+        /**
+         * DATA1: 通用数据列1
+         * 在代码中通常用于存储：主要的文本内容或某种状态（如是否完成）。
+         * 类型：通常是 TEXT（字符串）
+         */
+
+        String DATA1 = "data1";
 
         /**
-         * Latest modified date
-         * <P> Type: INTEGER (long) </P>
+         * DATA2: 通用数据列2
+         * 类型：通常是 INTEGER（整数）
+         * 比如：在闹钟类型中，这里可能存的是提醒的状态。
          */
-        public static final String MODIFIED_DATE = "modified_date";
+        String DATA2 = "data2";
 
         /**
-         * Data's content
-         * <P> Type: TEXT </P>
+         * DATA3:通用数据列3
+         * 类型：通常是字符串
          */
-        public static final String CONTENT = "content";
+        String DATA3 = "data3";
 
+        //DATA4,5依次类推，作为备用拓展位
+        String DATA4 = "data4";
 
-        /**
-         * Generic data column, the meaning is {@link #MIMETYPE} specific, used for
-         * integer data type
-         * <P> Type: INTEGER </P>
-         */
-        public static final String DATA1 = "data1";
+        String DATA5 = "data5";
 
-        /**
-         * Generic data column, the meaning is {@link #MIMETYPE} specific, used for
-         * integer data type
-         * <P> Type: INTEGER </P>
-         */
-        public static final String DATA2 = "data2";
-
-        /**
-         * Generic data column, the meaning is {@link #MIMETYPE} specific, used for
-         * TEXT data type
-         * <P> Type: TEXT </P>
-         */
-        public static final String DATA3 = "data3";
-
-        /**
-         * Generic data column, the meaning is {@link #MIMETYPE} specific, used for
-         * TEXT data type
-         * <P> Type: TEXT </P>
-         */
-        public static final String DATA4 = "data4";
-
-        /**
-         * Generic data column, the meaning is {@link #MIMETYPE} specific, used for
-         * TEXT data type
-         * <P> Type: TEXT </P>
-         */
-        public static final String DATA5 = "data5";
     }
 
     public static final class TextNote implements DataColumns {

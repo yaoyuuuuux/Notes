@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+//展示所有便签的列表。这是用户打开 App 第一个看到的界面。
 package net.micode.notes.ui;
 
 import android.app.Activity;

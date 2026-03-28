@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+//负责创建数据库表、升级数据库版本。
 package net.micode.notes.data;
 
 import android.content.ContentValues;
@@ -26,16 +26,16 @@ import net.micode.notes.data.Notes.DataColumns;
 import net.micode.notes.data.Notes.DataConstants;
 import net.micode.notes.data.Notes.NoteColumns;
 
-
+//继承 SQLiteOpenHelper，专门负责数据库的建立和版本管理
 public class NotesDatabaseHelper extends SQLiteOpenHelper {
-    private static final String DB_NAME = "note.db";
+    private static final String DB_NAME = "note.db";//数据库文件名
 
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 4;//数据库版本号
 
     public interface TABLE {
-        public static final String NOTE = "note";
+        String NOTE = "note";
 
-        public static final String DATA = "data";
+        String DATA = "data";
     }
 
     private static final String TAG = "NotesDatabaseHelper";
@@ -293,13 +293,14 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
         }
         return mInstance;
     }
-
+    //当第一次安装App时，这个方法会执行，创建存数据的表
     @Override
     public void onCreate(SQLiteDatabase db) {
+        //执行 SQL 语句创建表：包含内容、创建时间、修改时间等
         createNoteTable(db);
         createDataTable(db);
     }
-
+    //当你修改了代码中的数据库结构（比如多加了一列），版本号增加，这里会执行更新逻辑
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         boolean reCreateTriggers = false;
