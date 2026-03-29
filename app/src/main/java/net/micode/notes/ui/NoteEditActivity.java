@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+//允许用户输入数字、修改背景、设置提醒
 package net.micode.notes.ui;
 
 import android.annotation.SuppressLint;
@@ -129,11 +130,11 @@ public class NoteEditActivity extends Activity implements OnClickListener,
 
     private View mFontSizeSelector;
 
-    private EditText mNoteEditor;
+    private EditText mNoteEditor;//输入框控件
 
     private View mNoteEditorPanel;
 
-    private WorkingNote mWorkingNote;
+    private WorkingNote mWorkingNote;//正在编辑中的便签对象
 
     private SharedPreferences mSharedPrefs;
     private int mFontSizeId;
@@ -145,7 +146,8 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     public static final String TAG_CHECKED = String.valueOf('\u221A');
     public static final String TAG_UNCHECKED = String.valueOf('\u25A1');
 
-    private LinearLayout mEditTextList;  /*该代码片段（第123-147行）声明了类的成员变量，用于管理UI组件、笔记数据、用户偏好以及与字体大小和检查列表状态相关的常量。*/
+    private LinearLayout mEditTextList;
+    /*该代码片段（第123-147行）声明了类的成员变量，用于管理UI组件、笔记数据、用户偏好以及与字体大小和检查列表状态相关的常量。*/
 
     private String mUserQuery;
     private Pattern mPattern;
@@ -401,6 +403,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     @Override
     protected void onPause() {
         super.onPause();
+        //Android为了防止数据丢失，通常在用户离开编辑页（onPause）时自动保存
         if(saveNote()) {
             Log.d(TAG, "Note data was saved with length:" + mWorkingNote.getContent().length());
         }
@@ -799,7 +802,8 @@ public class NoteEditActivity extends Activity implements OnClickListener,
 
     private boolean saveNote() {
         getWorkingText();
-        boolean saved = mWorkingNote.saveNote();
+        boolean saved = mWorkingNote.saveNote();//获取输入框里的文字
+        //调用 mWorkingNote 对象的save方法，最终会通过NoteProvider写入数据库
         if (saved) {
             /**
              * There are two modes from List view to edit view, open one note,

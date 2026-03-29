@@ -77,6 +77,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import android.os.Handler;
+import android.os.Looper;
+import java.util.HashSet;
+// 如果报错找不到 AppWidgetManagerHelper，尝试导入下面这个（具体看你的项目结构）
+// import net.micode.notes.widget.NoteWidgetProvider;
 
 public class NotesListActivity extends Activity implements OnClickListener, OnItemLongClickListener {
     private static final int FOLDER_NOTE_LIST_QUERY_TOKEN = 0;
@@ -99,9 +106,9 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
 
     private BackgroundQueryHandler mBackgroundQueryHandler;
 
-    private NotesListAdapter mNotesListAdapter;
+    private NotesListAdapter mNotesListAdapter;//适配器：把数据库里的数据“翻译”成列表的一行行显示
 
-    private ListView mNotesListView;
+    private ListView mNotesListView;//展示列表的控件
 
     private Button mAddNewNote;
 
@@ -138,8 +145,8 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.note_list);
-        initResources();
+        setContentView(R.layout.note_list); //绑定布局文件 res/layout/note_list.xml
+        initResources(); //初始化控件
 
         /**
          * Insert an introduction when user firstly use this application
@@ -235,7 +242,6 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         private DropdownMenu mDropDownMenu;
         private ActionMode mActionMode;
         private MenuItem mMoveMenu;
-
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             getMenuInflater().inflate(R.menu.note_list_options, menu);
             menu.findItem(R.id.delete).setOnMenuItemClickListener(this);
@@ -467,8 +473,16 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         this.startActivityForResult(intent, REQUEST_CODE_NEW_NODE);
     }
 
-    private void batchDelete() {
-        new AsyncTask<Void, Void, HashSet<AppWidgetAttribute>>() {
+    // 在类中定义一个单线程池，专门负责处理数据库等耗时操作
+// 这比每次新建线程更省资源
+    private final ExecutorService mExecutorService = Executors.newSingleThreadExecutor();
+    //方法名：批量删除（batchDelete）
+    /*private void batchDelete()
+    //1.开启一个异步任务。AsyncTask<输入参数，进度百分比，结果类型>
+    {
+        new AsyncTask<Void, Void, HashSet<AppWidgetAttribute>>()
+        // AsyncTask已废弃+内存泄漏
+        {
             protected HashSet<AppWidgetAttribute> doInBackground(Void... unused) {
                 HashSet<AppWidgetAttribute> widgets = mNotesListAdapter.getSelectedWidget();
                 if (!isSyncMode()) {
@@ -502,8 +516,62 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                 mModeCallBack.finishActionMode();
             }
         }.execute();
-    }
+    }*/
 
+    private void batchDelete() {
+        // 1. 获取选中的 ID（这步在主线程做，因为涉及 UI 适配器）
+        final HashSet<Long> selectedIds = mNotesListAdapter.getSelectedItemIds();
+
+        // 2. 开启后台异步任务
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                // --- 这里是后台线程 (相当于之前的 doInBackground) ---
+
+                // 获取待更新的小部件信息（模拟原有的 doInBackground 逻辑）
+                //HashSet<AppWidgetAttribute> widgets = mNotesListAdapter.getSelectedWidgetAttributes();
+                HashSet<AppWidgetAttribute> widgets = mNotesListAdapter.getSelectedWidget();
+                if (!isSyncMode()) {
+                    // 执行真正的数据库删除操作
+                    DataUtils.batchDeleteNotes(getContentResolver(), selectedIds);
+                } else {
+                    // 同步模式下的移动到回收站逻辑
+                    DataUtils.batchMoveToFolder(getContentResolver(), selectedIds, Notes.ID_TRASH_FOLER);
+                }
+
+                // 3. 任务完成后，需要回到主线程更新 UI (相当于之前的 onPostExecute)
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    /*@Override
+                    public void run() {
+                        // --- 这里回到主线程 (UI Thread) ---
+                        // 更新桌面小部件状态
+                        if (widgets != null) {
+                            for (AppWidgetAttribute widget : widgets) {
+                                AppWidgetManagerHelper.updateWidget(NotesListActivity.this, widget.widgetId, widget.widgetType);
+                            }
+                        }
+                        // 刷新列表显示，提示用户删除成功
+                        mNotesListAdapter.notifyDataSetChanged();
+                        // 退出批量操作模式
+                        finishActionMode();
+                    }*/
+                    @Override
+                    public void run(){}
+                    protected void onPostExecute(HashSet<AppWidgetAttribute> widgets) {
+                        if (widgets != null) {
+                            for (AppWidgetAttribute widget : widgets) {
+                                if (widget.widgetId != AppWidgetManager.INVALID_APPWIDGET_ID
+                                        && widget.widgetType != Notes.TYPE_WIDGET_INVALIDE) {
+                                    updateWidget(widget.widgetId, widget.widgetType);
+                                }
+                            }
+                        }
+                        mModeCallBack.finishActionMode();
+                    }
+                });
+            }
+        });
+    }
     private void deleteFolder(long folderId) {
         if (folderId == Notes.ID_ROOT_FOLDER) {
             Log.e(TAG, "Wrong folder id, should not happen " + folderId);
