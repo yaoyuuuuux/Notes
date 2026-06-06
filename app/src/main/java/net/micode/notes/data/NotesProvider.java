@@ -299,10 +299,10 @@ public class NotesProvider extends ContentProvider {
 //
 //    @Override
 //    public String getType(Uri uri) {
-//        // TODO Auto-generated method stub
+//
 //        return null;
 //    }
-    // ... existing code ...
+
     @Override
     public boolean onCreate() {
         mHelper = NotesDatabaseHelper.getInstance(getContext());
