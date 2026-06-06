@@ -49,4 +49,10 @@
     <item
         android:id="@+id/menu_delete_remind"
         android:title="@string/menu_remove_remind" />
+
+<!--    在编辑页面添加入口-->
+    <item android:id="@+id/menu_ai_helper"
+      android:title="AI 助手"
+      android:showAsAction="ifRoom" />
+
 </menu>

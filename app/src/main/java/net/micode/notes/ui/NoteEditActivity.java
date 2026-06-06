@@ -545,6 +545,25 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         } else if (itemId == R.id.menu_delete_remind) {
             mWorkingNote.setAlertDate(0, false);
         }
+//        增加处理逻辑
+        case R.id.menu_ai_helper:
+    String text = mNoteEditor.getText().toString();
+    if (text.isEmpty()) {
+        Toast.makeText(this, "请先输入内容", Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+    AiApiHelper.getInstance().sendPrompt("请优化或续写以下内容：" + text,
+        new AiApiHelper.AiCallback() {
+            @Override public void onSuccess(String result) {
+                runOnUiThread(() -> mNoteEditor.append("\n\n✨ AI 建议：\n" + result));
+            }
+            @Override public void onError(String error) {
+                runOnUiThread(() -> Toast.makeText(NoteEditActivity.this, error, Toast.LENGTH_LONG).show());
+            }
+        });
+    break;
+
         return true;
     }
 
