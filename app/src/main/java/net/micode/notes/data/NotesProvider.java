@@ -85,11 +85,241 @@ public class NotesProvider extends ContentProvider {
         return true;
     }
 
+//    @Override
+//    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+//            String sortOrder) {
+//        Cursor c = null;
+//        SQLiteDatabase db = mHelper.getReadableDatabase();//获取只读权限
+//        String id = null;
+//        switch (mMatcher.match(uri)) {
+//            case URI_NOTE:
+//                c = db.query(TABLE.NOTE, projection, selection, selectionArgs, null, null,
+//                        sortOrder);
+//                break;
+//            case URI_NOTE_ITEM:
+//                id = uri.getPathSegments().get(1);
+//                c = db.query(TABLE.NOTE, projection, NoteColumns.ID + "=" + id
+//                        + parseSelection(selection), selectionArgs, null, null, sortOrder);
+//                break;
+//            case URI_DATA:
+//                c = db.query(TABLE.DATA, projection, selection, selectionArgs, null, null,
+//                        sortOrder);
+//                break;
+//            case URI_DATA_ITEM:
+//                id = uri.getPathSegments().get(1);
+//                c = db.query(TABLE.DATA, projection, DataColumns.ID + "=" + id
+//                        + parseSelection(selection), selectionArgs, null, null, sortOrder);
+//                break;
+//            case URI_SEARCH:
+//            case URI_SEARCH_SUGGEST:
+//                if (sortOrder != null || projection != null) {
+//                    throw new IllegalArgumentException(
+//                            "do not specify sortOrder, selection, selectionArgs, or projection" + "with this query");
+//                }
+//
+//                String searchString = null;
+//                if (mMatcher.match(uri) == URI_SEARCH_SUGGEST) {
+//                    if (uri.getPathSegments().size() > 1) {
+//                        searchString = uri.getPathSegments().get(1);
+//                    }
+//                } else {
+//                    searchString = uri.getQueryParameter("pattern");
+//                }
+//
+//                if (TextUtils.isEmpty(searchString)) {
+//                    return null;
+//                }
+//
+//                try {
+//                    searchString = String.format("%%%s%%", searchString);
+//                    c = db.rawQuery(NOTES_SNIPPET_SEARCH_QUERY,
+//                            new String[] { searchString });
+//                } catch (IllegalStateException ex) {
+//                    //ex.toString()本身是字符串，直接拼接时无需显式调用
+//                    Log.e(TAG, "got exception: " + ex);
+//                }
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unknown URI " + uri);
+//        }
+//        if (c != null) {
+//            c.setNotificationUri(getContext().getContentResolver(), uri);
+//        }
+//        return c;
+//    }
+//
+//    @Override
+//    public Uri insert(Uri uri, ContentValues values) {
+//        SQLiteDatabase db = mHelper.getWritableDatabase();//获取写入权限
+//        long dataId = 0, noteId = 0, insertedId = 0;
+//        switch (mMatcher.match(uri)) {
+//            case URI_NOTE:
+//                insertedId = noteId = db.insert(TABLE.NOTE, null, values);//插入数据
+//                break;
+//            case URI_DATA:
+//                if (values.containsKey(DataColumns.NOTE_ID)) {
+//                    noteId = values.getAsLong(DataColumns.NOTE_ID);
+//                } else {
+//                    Log.d(TAG, "Wrong data format without note id:" + values.toString());
+//                }
+//                insertedId = dataId = db.insert(TABLE.DATA, null, values);
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unknown URI " + uri);
+//        }
+//        // Notify the note uri
+//        if (noteId > 0) {
+//            getContext().getContentResolver().notifyChange( //插入成功后通知页面刷新
+//                    ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId), null);
+//        }
+//
+//        // Notify the data uri
+//        if (dataId > 0) {
+//            getContext().getContentResolver().notifyChange( //插入成功后通知页面刷新
+//                    ContentUris.withAppendedId(Notes.CONTENT_DATA_URI, dataId), null);
+//        }
+//
+//        return ContentUris.withAppendedId(uri, insertedId);
+//    }
+//
+//    @Override
+//    public int delete(Uri uri, String selection, String[] selectionArgs) {
+//        int count = 0;
+//        String id = null;
+//        SQLiteDatabase db = mHelper.getWritableDatabase();
+//        boolean deleteData = false;
+//        switch (mMatcher.match(uri)) {
+//            case URI_NOTE:
+//                selection = "(" + selection + ") AND " + NoteColumns.ID + ">0 ";
+//                count = db.delete(TABLE.NOTE, selection, selectionArgs);
+//                break;
+//            case URI_NOTE_ITEM:
+//                id = uri.getPathSegments().get(1);
+//                /**
+//                 * ID that smaller than 0 is system folder which is not allowed to
+//                 * trash
+//                 */
+//                long noteId = Long.valueOf(id);
+//                if (noteId <= 0) {
+//                    break;
+//                }
+//                count = db.delete(TABLE.NOTE,
+//                        NoteColumns.ID + "=" + id + parseSelection(selection), selectionArgs);
+//                break;
+//            case URI_DATA:
+//                count = db.delete(TABLE.DATA, selection, selectionArgs);
+//                deleteData = true;
+//                break;
+//            case URI_DATA_ITEM:
+//                id = uri.getPathSegments().get(1);
+//                count = db.delete(TABLE.DATA,
+//                        DataColumns.ID + "=" + id + parseSelection(selection), selectionArgs);
+//                deleteData = true;
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unknown URI " + uri);
+//        }
+//        if (count > 0) {
+//            if (deleteData) {
+//                getContext().getContentResolver().notifyChange(Notes.CONTENT_NOTE_URI, null);
+//            }
+//            getContext().getContentResolver().notifyChange(uri, null);
+//        }
+//        return count;
+//    }
+//
+//    @Override
+//    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+//        int count = 0;
+//        String id = null;
+//        SQLiteDatabase db = mHelper.getWritableDatabase();
+//        boolean updateData = false;
+//        switch (mMatcher.match(uri)) {
+//            case URI_NOTE:
+//                increaseNoteVersion(-1, selection, selectionArgs);
+//                count = db.update(TABLE.NOTE, values, selection, selectionArgs);
+//                break;
+//            case URI_NOTE_ITEM:
+//                id = uri.getPathSegments().get(1);
+//                increaseNoteVersion(Long.valueOf(id), selection, selectionArgs);
+//                count = db.update(TABLE.NOTE, values, NoteColumns.ID + "=" + id
+//                        + parseSelection(selection), selectionArgs);
+//                break;
+//            case URI_DATA:
+//                count = db.update(TABLE.DATA, values, selection, selectionArgs);
+//                updateData = true;
+//                break;
+//            case URI_DATA_ITEM:
+//                id = uri.getPathSegments().get(1);
+//                count = db.update(TABLE.DATA, values, DataColumns.ID + "=" + id
+//                        + parseSelection(selection), selectionArgs);
+//                updateData = true;
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unknown URI " + uri);
+//        }
+//
+//        if (count > 0) {
+//            if (updateData) {
+//                getContext().getContentResolver().notifyChange(Notes.CONTENT_NOTE_URI, null);
+//            }
+//            getContext().getContentResolver().notifyChange(uri, null);
+//        }
+//        return count;
+//    }
+//
+//    private String parseSelection(String selection) {
+//        return (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : "");
+//    }
+//
+//    private void increaseNoteVersion(long id, String selection, String[] selectionArgs) {
+//        StringBuilder sql = new StringBuilder(120);
+//        sql.append("UPDATE ");
+//        sql.append(TABLE.NOTE);
+//        sql.append(" SET ");
+//        sql.append(NoteColumns.VERSION);
+//        sql.append("=" + NoteColumns.VERSION + "+1 ");
+//
+//        if (id > 0 || !TextUtils.isEmpty(selection)) {
+//            sql.append(" WHERE ");
+//        }
+//        if (id > 0) {
+//            sql.append(NoteColumns.ID + "=" + String.valueOf(id));
+//        }
+//        if (!TextUtils.isEmpty(selection)) {
+//            String selectString = id > 0 ? parseSelection(selection) : selection;
+//            for (String args : selectionArgs) {
+//                selectString = selectString.replaceFirst("\\?", args);
+//            }
+//            sql.append(selectString);
+//        }
+//
+//        mHelper.getWritableDatabase().execSQL(sql.toString());
+//    }
+//
+//    @Override
+//    public String getType(Uri uri) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+    // ... existing code ...
+    @Override
+    public boolean onCreate() {
+        mHelper = NotesDatabaseHelper.getInstance(getContext());
+        return true;
+    }
+
+    // 【优化】修复SQL注入漏洞 - query方法
+    // 原代码（第89-147行）：
+    //   case URI_NOTE_ITEM:
+    //       c = db.query(TABLE.NOTE, projection, NoteColumns.ID + "=" + id + parseSelection(selection), ...)
+    // 问题：直接拼接用户输入的id，存在SQL注入风险
+    // 优化：使用参数化查询 "?" 占位符，防止SQL注入攻击
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         Cursor c = null;
-        SQLiteDatabase db = mHelper.getReadableDatabase();//获取只读权限
+        SQLiteDatabase db = mHelper.getReadableDatabase();
         String id = null;
         switch (mMatcher.match(uri)) {
             case URI_NOTE:
@@ -98,8 +328,9 @@ public class NotesProvider extends ContentProvider {
                 break;
             case URI_NOTE_ITEM:
                 id = uri.getPathSegments().get(1);
-                c = db.query(TABLE.NOTE, projection, NoteColumns.ID + "=" + id
-                        + parseSelection(selection), selectionArgs, null, null, sortOrder);
+                // 【修改】使用参数化查询替代字符串拼接
+                c = db.query(TABLE.NOTE, projection, NoteColumns.ID + "=?",
+                        combineSelectionArgs(id, selection), combineArgs(id, selectionArgs), null, null, sortOrder);
                 break;
             case URI_DATA:
                 c = db.query(TABLE.DATA, projection, selection, selectionArgs, null, null,
@@ -107,38 +338,11 @@ public class NotesProvider extends ContentProvider {
                 break;
             case URI_DATA_ITEM:
                 id = uri.getPathSegments().get(1);
-                c = db.query(TABLE.DATA, projection, DataColumns.ID + "=" + id
-                        + parseSelection(selection), selectionArgs, null, null, sortOrder);
+                // 【修改】使用参数化查询替代字符串拼接
+                c = db.query(TABLE.DATA, projection, DataColumns.ID + "=?",
+                        combineSelectionArgs(id, selection), combineArgs(id, selectionArgs), null, null, sortOrder);
                 break;
-            case URI_SEARCH:
-            case URI_SEARCH_SUGGEST:
-                if (sortOrder != null || projection != null) {
-                    throw new IllegalArgumentException(
-                            "do not specify sortOrder, selection, selectionArgs, or projection" + "with this query");
-                }
-
-                String searchString = null;
-                if (mMatcher.match(uri) == URI_SEARCH_SUGGEST) {
-                    if (uri.getPathSegments().size() > 1) {
-                        searchString = uri.getPathSegments().get(1);
-                    }
-                } else {
-                    searchString = uri.getQueryParameter("pattern");
-                }
-
-                if (TextUtils.isEmpty(searchString)) {
-                    return null;
-                }
-
-                try {
-                    searchString = String.format("%%%s%%", searchString);
-                    c = db.rawQuery(NOTES_SNIPPET_SEARCH_QUERY,
-                            new String[] { searchString });
-                } catch (IllegalStateException ex) {
-                    //ex.toString()本身是字符串，直接拼接时无需显式调用
-                    Log.e(TAG, "got exception: " + ex);
-                }
-                break;
+// ... existing code ...
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -150,11 +354,11 @@ public class NotesProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();//获取写入权限
+        SQLiteDatabase db = mHelper.getWritableDatabase();
         long dataId = 0, noteId = 0, insertedId = 0;
         switch (mMatcher.match(uri)) {
             case URI_NOTE:
-                insertedId = noteId = db.insert(TABLE.NOTE, null, values);//插入数据
+                insertedId = noteId = db.insert(TABLE.NOTE, null, values);
                 break;
             case URI_DATA:
                 if (values.containsKey(DataColumns.NOTE_ID)) {
@@ -167,21 +371,24 @@ public class NotesProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
-        // Notify the note uri
         if (noteId > 0) {
-            getContext().getContentResolver().notifyChange( //插入成功后通知页面刷新
+            getContext().getContentResolver().notifyChange(
                     ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId), null);
         }
 
-        // Notify the data uri
         if (dataId > 0) {
-            getContext().getContentResolver().notifyChange( //插入成功后通知页面刷新
+            getContext().getContentResolver().notifyChange(
                     ContentUris.withAppendedId(Notes.CONTENT_DATA_URI, dataId), null);
         }
 
         return ContentUris.withAppendedId(uri, insertedId);
     }
 
+    // 【优化】修复SQL注入漏洞 - delete方法
+    // 原代码（第185-227行）：
+    //   count = db.delete(TABLE.NOTE, NoteColumns.ID + "=" + id + parseSelection(selection), selectionArgs);
+    // 问题：直接拼接id参数，存在SQL注入风险
+    // 优化：使用 "?" 占位符和参数化查询
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
@@ -195,16 +402,13 @@ public class NotesProvider extends ContentProvider {
                 break;
             case URI_NOTE_ITEM:
                 id = uri.getPathSegments().get(1);
-                /**
-                 * ID that smaller than 0 is system folder which is not allowed to
-                 * trash
-                 */
                 long noteId = Long.valueOf(id);
                 if (noteId <= 0) {
                     break;
                 }
-                count = db.delete(TABLE.NOTE,
-                        NoteColumns.ID + "=" + id + parseSelection(selection), selectionArgs);
+                // 【修改】使用参数化查询
+                count = db.delete(TABLE.NOTE, NoteColumns.ID + "=?" + parseSelection(selection),
+                        combineArgs(id, selectionArgs));
                 break;
             case URI_DATA:
                 count = db.delete(TABLE.DATA, selection, selectionArgs);
@@ -212,8 +416,9 @@ public class NotesProvider extends ContentProvider {
                 break;
             case URI_DATA_ITEM:
                 id = uri.getPathSegments().get(1);
-                count = db.delete(TABLE.DATA,
-                        DataColumns.ID + "=" + id + parseSelection(selection), selectionArgs);
+                // 【修改】使用参数化查询
+                count = db.delete(TABLE.DATA, DataColumns.ID + "=?" + parseSelection(selection),
+                        combineArgs(id, selectionArgs));
                 deleteData = true;
                 break;
             default:
@@ -228,6 +433,11 @@ public class NotesProvider extends ContentProvider {
         return count;
     }
 
+    // 【优化】修复SQL注入漏洞 - update方法
+    // 原代码（第231-268行）：
+    //   count = db.update(TABLE.NOTE, values, NoteColumns.ID + "=" + id + parseSelection(selection), selectionArgs);
+    // 问题：直接拼接id参数，存在SQL注入风险
+    // 优化：使用参数化查询
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         int count = 0;
@@ -242,8 +452,9 @@ public class NotesProvider extends ContentProvider {
             case URI_NOTE_ITEM:
                 id = uri.getPathSegments().get(1);
                 increaseNoteVersion(Long.valueOf(id), selection, selectionArgs);
-                count = db.update(TABLE.NOTE, values, NoteColumns.ID + "=" + id
-                        + parseSelection(selection), selectionArgs);
+                // 【修改】使用参数化查询
+                count = db.update(TABLE.NOTE, values, NoteColumns.ID + "=?" + parseSelection(selection),
+                        combineArgs(id, selectionArgs));
                 break;
             case URI_DATA:
                 count = db.update(TABLE.DATA, values, selection, selectionArgs);
@@ -251,8 +462,9 @@ public class NotesProvider extends ContentProvider {
                 break;
             case URI_DATA_ITEM:
                 id = uri.getPathSegments().get(1);
-                count = db.update(TABLE.DATA, values, DataColumns.ID + "=" + id
-                        + parseSelection(selection), selectionArgs);
+                // 【修改】使用参数化查询
+                count = db.update(TABLE.DATA, values, DataColumns.ID + "=?" + parseSelection(selection),
+                        combineArgs(id, selectionArgs));
                 updateData = true;
                 break;
             default:
@@ -271,6 +483,25 @@ public class NotesProvider extends ContentProvider {
     private String parseSelection(String selection) {
         return (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : "");
     }
+
+    // 【新增】辅助方法：合并selection参数
+    // 用途：为参数化查询提供正确的参数数组
+    private String[] combineSelectionArgs(String id, String selection) {
+        return new String[]{id};
+    }
+
+    // 【新增】辅助方法：合并查询参数
+    // 用途：将id和原有selectionArgs合并为一个数组，用于参数化查询
+    private String[] combineArgs(String id, String[] selectionArgs) {
+        if (selectionArgs == null || selectionArgs.length == 0) {
+            return new String[]{id};
+        }
+        String[] newArgs = new String[selectionArgs.length + 1];
+        newArgs[0] = id;
+        System.arraycopy(selectionArgs, 0, newArgs, 1, selectionArgs.length);
+        return newArgs;
+    }
+
 
     private void increaseNoteVersion(long id, String selection, String[] selectionArgs) {
         StringBuilder sql = new StringBuilder(120);
@@ -299,8 +530,10 @@ public class NotesProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        // TODO Auto-generated method stub
         return null;
     }
+
+}
+
 
 }

@@ -114,99 +114,294 @@ public class DataUtils {
     /**
      * Get the all folder count except system folders {@link Notes#TYPE_SYSTEM}}
      */
+//    public static int getUserFolderCount(ContentResolver resolver) {
+//        Cursor cursor =resolver.query(Notes.CONTENT_NOTE_URI,
+//                new String[] { "COUNT(*)" },
+//                NoteColumns.TYPE + "=? AND " + NoteColumns.PARENT_ID + "<>?",
+//                new String[] { String.valueOf(Notes.TYPE_FOLDER), String.valueOf(Notes.ID_TRASH_FOLER)},
+//                null);
+//
+//        int count = 0;
+//        if(cursor != null) {
+//            if(cursor.moveToFirst()) {
+//                try {
+//                    count = cursor.getInt(0);
+//                } catch (IndexOutOfBoundsException e) {
+//                    Log.e(TAG, "get folder count failed:" + e.toString());
+//                } finally {
+//                    cursor.close();
+//                }
+//            }
+//        }
+//        return count;
+//    }
+//
+//    public static boolean visibleInNoteDatabase(ContentResolver resolver, long noteId, int type) {
+//        Cursor cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId),
+//                null,
+//                NoteColumns.TYPE + "=? AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER,
+//                new String [] {String.valueOf(type)},
+//                null);
+//
+//        boolean exist = false;
+//        if (cursor != null) {
+//            if (cursor.getCount() > 0) {
+//                exist = true;
+//            }
+//            cursor.close();
+//        }
+//        return exist;
+//    }
+//
+//    public static boolean existInNoteDatabase(ContentResolver resolver, long noteId) {
+//        Cursor cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId),
+//                null, null, null, null);
+//
+//        boolean exist = false;
+//        if (cursor != null) {
+//            if (cursor.getCount() > 0) {
+//                exist = true;
+//            }
+//            cursor.close();
+//        }
+//        return exist;
+//    }
+//
+//    public static boolean existInDataDatabase(ContentResolver resolver, long dataId) {
+//        Cursor cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_DATA_URI, dataId),
+//                null, null, null, null);
+//
+//        boolean exist = false;
+//        if (cursor != null) {
+//            if (cursor.getCount() > 0) {
+//                exist = true;
+//            }
+//            cursor.close();
+//        }
+//        return exist;
+//    }
+//
+//    public static boolean checkVisibleFolderName(ContentResolver resolver, String name) {
+//        Cursor cursor = resolver.query(Notes.CONTENT_NOTE_URI, null,
+//                NoteColumns.TYPE + "=" + Notes.TYPE_FOLDER +
+//                " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER +
+//                " AND " + NoteColumns.SNIPPET + "=?",
+//                new String[] { name }, null);
+//        boolean exist = false;
+//        if(cursor != null) {
+//            if(cursor.getCount() > 0) {
+//                exist = true;
+//            }
+//            cursor.close();
+//        }
+//        return exist;
+//    }
+//
+//    public static HashSet<AppWidgetAttribute> getFolderNoteWidget(ContentResolver resolver, long folderId) {
+//        Cursor c = resolver.query(Notes.CONTENT_NOTE_URI,
+//                new String[] { NoteColumns.WIDGET_ID, NoteColumns.WIDGET_TYPE },
+//                NoteColumns.PARENT_ID + "=?",
+//                new String[] { String.valueOf(folderId) },
+//                null);
+//
+//        HashSet<AppWidgetAttribute> set = null;
+//        if (c != null) {
+//            if (c.moveToFirst()) {
+//                set = new HashSet<AppWidgetAttribute>();
+//                do {
+//                    try {
+//                        AppWidgetAttribute widget = new AppWidgetAttribute();
+//                        widget.widgetId = c.getInt(0);
+//                        widget.widgetType = c.getInt(1);
+//                        set.add(widget);
+//                    } catch (IndexOutOfBoundsException e) {
+//                        Log.e(TAG, e.toString());
+//                    }
+//                } while (c.moveToNext());
+//            }
+//            c.close();
+//        }
+//        return set;
+//    }
+//
+//    public static String getCallNumberByNoteId(ContentResolver resolver, long noteId) {
+//        Cursor cursor = resolver.query(Notes.CONTENT_DATA_URI,
+//                new String [] { CallNote.PHONE_NUMBER },
+//                CallNote.NOTE_ID + "=? AND " + CallNote.MIME_TYPE + "=?",
+//                new String [] { String.valueOf(noteId), CallNote.CONTENT_ITEM_TYPE },
+//                null);
+//
+//        if (cursor != null && cursor.moveToFirst()) {
+//            try {
+//                return cursor.getString(0);
+//            } catch (IndexOutOfBoundsException e) {
+//                Log.e(TAG, "Get call number fails " + e.toString());
+//            } finally {
+//                cursor.close();
+//            }
+//        }
+//        return "";
+//    }
+//
+//    public static long getNoteIdByPhoneNumberAndCallDate(ContentResolver resolver, String phoneNumber, long callDate) {
+//        Cursor cursor = resolver.query(Notes.CONTENT_DATA_URI,
+//                new String [] { CallNote.NOTE_ID },
+//                CallNote.CALL_DATE + "=? AND " + CallNote.MIME_TYPE + "=? AND PHONE_NUMBERS_EQUAL("
+//                + CallNote.PHONE_NUMBER + ",?)",
+//                new String [] { String.valueOf(callDate), CallNote.CONTENT_ITEM_TYPE, phoneNumber },
+//                null);
+//
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                try {
+//                    return cursor.getLong(0);
+//                } catch (IndexOutOfBoundsException e) {
+//                    Log.e(TAG, "Get call note id fails " + e.toString());
+//                }
+//            }
+//            cursor.close();
+//        }
+//        return 0;
+//    }
+//
+//    public static String getSnippetById(ContentResolver resolver, long noteId) {
+//        Cursor cursor = resolver.query(Notes.CONTENT_NOTE_URI,
+//                new String [] { NoteColumns.SNIPPET },
+//                NoteColumns.ID + "=?",
+//                new String [] { String.valueOf(noteId)},
+//                null);
+//
+//        if (cursor != null) {
+//            String snippet = "";
+//            if (cursor.moveToFirst()) {
+//                snippet = cursor.getString(0);
+//            }
+//            cursor.close();
+//            return snippet;
+//        }
+//        throw new IllegalArgumentException("Note is not found with id: " + noteId);
+//    }
+
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第117-137行）：Cursor没有在finally中关闭
+    // 优化：使用try-finally确保资源释放
     public static int getUserFolderCount(ContentResolver resolver) {
-        Cursor cursor =resolver.query(Notes.CONTENT_NOTE_URI,
-                new String[] { "COUNT(*)" },
-                NoteColumns.TYPE + "=? AND " + NoteColumns.PARENT_ID + "<>?",
-                new String[] { String.valueOf(Notes.TYPE_FOLDER), String.valueOf(Notes.ID_TRASH_FOLER)},
-                null);
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(Notes.CONTENT_NOTE_URI,
+                    new String[] { "COUNT(*)" },
+                    NoteColumns.TYPE + "=? AND " + NoteColumns.PARENT_ID + "<>?",
+                    new String[] { String.valueOf(Notes.TYPE_FOLDER), String.valueOf(Notes.ID_TRASH_FOLER)},
+                    null);
 
-        int count = 0;
-        if(cursor != null) {
-            if(cursor.moveToFirst()) {
-                try {
-                    count = cursor.getInt(0);
-                } catch (IndexOutOfBoundsException e) {
-                    Log.e(TAG, "get folder count failed:" + e.toString());
-                } finally {
-                    cursor.close();
-                }
+            if(cursor != null && cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            Log.e(TAG, "get folder count failed:" + e.toString());
+        } finally {
+            // 【关键】确保Cursor被关闭
+            if (cursor != null) {
+                cursor.close();
             }
         }
-        return count;
+        return 0;
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第139-154行）：Cursor未在finally中关闭
     public static boolean visibleInNoteDatabase(ContentResolver resolver, long noteId, int type) {
-        Cursor cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId),
-                null,
-                NoteColumns.TYPE + "=? AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER,
-                new String [] {String.valueOf(type)},
-                null);
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId),
+                    null,
+                    NoteColumns.TYPE + "=? AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER,
+                    new String [] {String.valueOf(type)},
+                    null);
 
-        boolean exist = false;
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                exist = true;
+            if (cursor != null) {
+                return cursor.getCount() > 0;
             }
-            cursor.close();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        return exist;
+        return false;
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第156-168行）：Cursor未在finally中关闭
     public static boolean existInNoteDatabase(ContentResolver resolver, long noteId) {
-        Cursor cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId),
-                null, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId),
+                    null, null, null, null);
 
-        boolean exist = false;
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                exist = true;
+            if (cursor != null) {
+                return cursor.getCount() > 0;
             }
-            cursor.close();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        return exist;
+        return false;
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第170-182行）：Cursor未在finally中关闭
     public static boolean existInDataDatabase(ContentResolver resolver, long dataId) {
-        Cursor cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_DATA_URI, dataId),
-                null, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(ContentUris.withAppendedId(Notes.CONTENT_DATA_URI, dataId),
+                    null, null, null, null);
 
-        boolean exist = false;
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                exist = true;
+            if (cursor != null) {
+                return cursor.getCount() > 0;
             }
-            cursor.close();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        return exist;
+        return false;
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第184-198行）：Cursor未在finally中关闭
     public static boolean checkVisibleFolderName(ContentResolver resolver, String name) {
-        Cursor cursor = resolver.query(Notes.CONTENT_NOTE_URI, null,
-                NoteColumns.TYPE + "=" + Notes.TYPE_FOLDER +
-                " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER +
-                " AND " + NoteColumns.SNIPPET + "=?",
-                new String[] { name }, null);
-        boolean exist = false;
-        if(cursor != null) {
-            if(cursor.getCount() > 0) {
-                exist = true;
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(Notes.CONTENT_NOTE_URI, null,
+                    NoteColumns.TYPE + "=" + Notes.TYPE_FOLDER +
+                    " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER +
+                    " AND " + NoteColumns.SNIPPET + "=?",
+                    new String[] { name }, null);
+            if(cursor != null) {
+                return cursor.getCount() > 0;
             }
-            cursor.close();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        return exist;
+        return false;
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第200-225行）：Cursor未在finally中关闭
     public static HashSet<AppWidgetAttribute> getFolderNoteWidget(ContentResolver resolver, long folderId) {
-        Cursor c = resolver.query(Notes.CONTENT_NOTE_URI,
-                new String[] { NoteColumns.WIDGET_ID, NoteColumns.WIDGET_TYPE },
-                NoteColumns.PARENT_ID + "=?",
-                new String[] { String.valueOf(folderId) },
-                null);
+        Cursor c = null;
+        try {
+            c = resolver.query(Notes.CONTENT_NOTE_URI,
+                    new String[] { NoteColumns.WIDGET_ID, NoteColumns.WIDGET_TYPE },
+                    NoteColumns.PARENT_ID + "=?",
+                    new String[] { String.valueOf(folderId) },
+                    null);
 
-        HashSet<AppWidgetAttribute> set = null;
-        if (c != null) {
-            if (c.moveToFirst()) {
+            HashSet<AppWidgetAttribute> set = null;
+            if (c != null && c.moveToFirst()) {
                 set = new HashSet<AppWidgetAttribute>();
                 do {
                     try {
@@ -219,68 +414,89 @@ public class DataUtils {
                     }
                 } while (c.moveToNext());
             }
-            c.close();
+            return set;
+        } finally {
+            if (c != null) {
+                c.close();
+            }
         }
-        return set;
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第227-244行）：Cursor未在finally中关闭
     public static String getCallNumberByNoteId(ContentResolver resolver, long noteId) {
-        Cursor cursor = resolver.query(Notes.CONTENT_DATA_URI,
-                new String [] { CallNote.PHONE_NUMBER },
-                CallNote.NOTE_ID + "=? AND " + CallNote.MIME_TYPE + "=?",
-                new String [] { String.valueOf(noteId), CallNote.CONTENT_ITEM_TYPE },
-                null);
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(Notes.CONTENT_DATA_URI,
+                    new String [] { CallNote.PHONE_NUMBER },
+                    CallNote.NOTE_ID + "=? AND " + CallNote.MIME_TYPE + "=?",
+                    new String [] { String.valueOf(noteId), CallNote.CONTENT_ITEM_TYPE },
+                    null);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            try {
+            if (cursor != null && cursor.moveToFirst()) {
                 return cursor.getString(0);
-            } catch (IndexOutOfBoundsException e) {
-                Log.e(TAG, "Get call number fails " + e.toString());
-            } finally {
+            }
+        } catch (IndexOutOfBoundsException e) {
+            Log.e(TAG, "Get call number fails " + e.toString());
+        } finally {
+            if (cursor != null) {
                 cursor.close();
             }
         }
         return "";
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第246-265行）：Cursor未在finally中关闭
     public static long getNoteIdByPhoneNumberAndCallDate(ContentResolver resolver, String phoneNumber, long callDate) {
-        Cursor cursor = resolver.query(Notes.CONTENT_DATA_URI,
-                new String [] { CallNote.NOTE_ID },
-                CallNote.CALL_DATE + "=? AND " + CallNote.MIME_TYPE + "=? AND PHONE_NUMBERS_EQUAL("
-                + CallNote.PHONE_NUMBER + ",?)",
-                new String [] { String.valueOf(callDate), CallNote.CONTENT_ITEM_TYPE, phoneNumber },
-                null);
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(Notes.CONTENT_DATA_URI,
+                    new String [] { CallNote.NOTE_ID },
+                    CallNote.CALL_DATE + "=? AND " + CallNote.MIME_TYPE + "=? AND PHONE_NUMBERS_EQUAL("
+                    + CallNote.PHONE_NUMBER + ",?)",
+                    new String [] { String.valueOf(callDate), CallNote.CONTENT_ITEM_TYPE, phoneNumber },
+                    null);
 
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                try {
-                    return cursor.getLong(0);
-                } catch (IndexOutOfBoundsException e) {
-                    Log.e(TAG, "Get call note id fails " + e.toString());
-                }
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getLong(0);
             }
-            cursor.close();
+        } catch (IndexOutOfBoundsException e) {
+            Log.e(TAG, "Get call note id fails " + e.toString());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
         return 0;
     }
 
+    // 【优化】修复Cursor资源泄漏
+    // 原代码（第267-283行）：Cursor未在finally中关闭
     public static String getSnippetById(ContentResolver resolver, long noteId) {
-        Cursor cursor = resolver.query(Notes.CONTENT_NOTE_URI,
-                new String [] { NoteColumns.SNIPPET },
-                NoteColumns.ID + "=?",
-                new String [] { String.valueOf(noteId)},
-                null);
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(Notes.CONTENT_NOTE_URI,
+                    new String [] { NoteColumns.SNIPPET },
+                    NoteColumns.ID + "=?",
+                    new String [] { String.valueOf(noteId)},
+                    null);
 
-        if (cursor != null) {
-            String snippet = "";
-            if (cursor.moveToFirst()) {
-                snippet = cursor.getString(0);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(0);
+                }
+            } else {
+                throw new IllegalArgumentException("Note is not found with id: " + noteId);
             }
-            cursor.close();
-            return snippet;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        throw new IllegalArgumentException("Note is not found with id: " + noteId);
+        return "";
     }
+
 
     public static String getFormattedSnippet(String snippet) {
         if (snippet != null) {

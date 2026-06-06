@@ -124,13 +124,73 @@ public class WorkingNote {
         loadNote();
     }
 
-    private void loadNote() {
-        Cursor cursor = mContext.getContentResolver().query(
-                ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, mNoteId), NOTE_PROJECTION, null,
-                null, null);
+//    private void loadNote() {
+//        Cursor cursor = mContext.getContentResolver().query(
+//                ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, mNoteId), NOTE_PROJECTION, null,
+//                null, null);
+//
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                mFolderId = cursor.getLong(NOTE_PARENT_ID_COLUMN);
+//                mBgColorId = cursor.getInt(NOTE_BG_COLOR_ID_COLUMN);
+//                mWidgetId = cursor.getInt(NOTE_WIDGET_ID_COLUMN);
+//                mWidgetType = cursor.getInt(NOTE_WIDGET_TYPE_COLUMN);
+//                mAlertDate = cursor.getLong(NOTE_ALERTED_DATE_COLUMN);
+//                mModifiedDate = cursor.getLong(NOTE_MODIFIED_DATE_COLUMN);
+//            }
+//            cursor.close();
+//        } else {
+//            Log.e(TAG, "No note with id:" + mNoteId);
+//            throw new IllegalArgumentException("Unable to find note with id " + mNoteId);
+//        }
+//        loadNoteData();
+//    }
+//
+//    private void loadNoteData() {
+//        Cursor cursor = mContext.getContentResolver().query(Notes.CONTENT_DATA_URI, DATA_PROJECTION,
+//                DataColumns.NOTE_ID + "=?", new String[] {
+//                    String.valueOf(mNoteId)
+//                }, null);
+//
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    String type = cursor.getString(DATA_MIME_TYPE_COLUMN);
+//                    if (DataConstants.NOTE.equals(type)) {
+//                        mContent = cursor.getString(DATA_CONTENT_COLUMN);
+//                        mMode = cursor.getInt(DATA_MODE_COLUMN);
+//                        mNote.setTextDataId(cursor.getLong(DATA_ID_COLUMN));
+//                    } else if (DataConstants.CALL_NOTE.equals(type)) {
+//                        mNote.setCallDataId(cursor.getLong(DATA_ID_COLUMN));
+//                    } else {
+//                        Log.d(TAG, "Wrong note type with type:" + type);
+//                    }
+//                } while (cursor.moveToNext());
+//            }
+//            cursor.close();
+//        } else {
+//            Log.e(TAG, "No data with id:" + mNoteId);
+//            throw new IllegalArgumentException("Unable to find note's data with id " + mNoteId);
+//        }
+//    }
 
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
+    // 【优化】修复Cursor资源泄漏问题
+    // 原代码（第127-146行）：
+    //   Cursor cursor = mContext.getContentResolver().query(...);
+    //   if (cursor != null) {
+    //       if (cursor.moveToFirst()) { ... }
+    //       cursor.close();  // 如果moveToFirst抛异常，cursor不会关闭
+    //   }
+    // 问题：Cursor没有在finally块中关闭，可能导致资源泄漏
+    // 优化：使用try-finally确保Cursor始终被关闭
+    private void loadNote() {
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(
+                    ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, mNoteId), NOTE_PROJECTION, null,
+                    null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
                 mFolderId = cursor.getLong(NOTE_PARENT_ID_COLUMN);
                 mBgColorId = cursor.getInt(NOTE_BG_COLOR_ID_COLUMN);
                 mWidgetId = cursor.getInt(NOTE_WIDGET_ID_COLUMN);
@@ -138,22 +198,31 @@ public class WorkingNote {
                 mAlertDate = cursor.getLong(NOTE_ALERTED_DATE_COLUMN);
                 mModifiedDate = cursor.getLong(NOTE_MODIFIED_DATE_COLUMN);
             }
-            cursor.close();
-        } else {
+        } finally {
+            // 【关键】在finally块中关闭Cursor，确保即使发生异常也能释放资源
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        if (cursor == null) {
             Log.e(TAG, "No note with id:" + mNoteId);
             throw new IllegalArgumentException("Unable to find note with id " + mNoteId);
         }
         loadNoteData();
     }
 
+    // 【优化】修复Cursor资源泄漏问题
+    // 原代码（第149-175行）：同样的问题，Cursor未在finally中关闭
+    // 优化：使用try-finally确保资源释放
     private void loadNoteData() {
-        Cursor cursor = mContext.getContentResolver().query(Notes.CONTENT_DATA_URI, DATA_PROJECTION,
-                DataColumns.NOTE_ID + "=?", new String[] {
-                    String.valueOf(mNoteId)
-                }, null);
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(Notes.CONTENT_DATA_URI, DATA_PROJECTION,
+                    DataColumns.NOTE_ID + "=?", new String[] {
+                        String.valueOf(mNoteId)
+                    }, null);
 
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 do {
                     String type = cursor.getString(DATA_MIME_TYPE_COLUMN);
                     if (DataConstants.NOTE.equals(type)) {
@@ -167,12 +236,18 @@ public class WorkingNote {
                     }
                 } while (cursor.moveToNext());
             }
-            cursor.close();
-        } else {
+        } finally {
+            // 【关键】在finally块中关闭Cursor
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        if (cursor == null) {
             Log.e(TAG, "No data with id:" + mNoteId);
             throw new IllegalArgumentException("Unable to find note's data with id " + mNoteId);
         }
     }
+
 
     public static WorkingNote createEmptyNote(Context context, long folderId, int widgetId,
             int widgetType, int defaultBgColorId) {
