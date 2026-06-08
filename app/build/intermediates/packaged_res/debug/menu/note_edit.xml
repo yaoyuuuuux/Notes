@@ -16,9 +16,11 @@
 -->
 
 <menu
-    xmlns:android="http://schemas.android.com/apk/res/android">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
+
+<item
         android:id="@+id/menu_new_note"
         android:title="@string/notelist_menu_new"/>
 
@@ -49,4 +51,21 @@
     <item
         android:id="@+id/menu_delete_remind"
         android:title="@string/menu_remove_remind" />
+
+
+
+
+           
+
+        <!-- ... existing code ... -->
+
+        <!--    在编辑页面添加入口-->
+    <item
+        android:id="@+id/menu_ai_helper"
+        android:icon="@drawable/ic_ai_helper"
+        android:title="AI 助手"
+        app:showAsAction="never" />
+
+
+
 </menu>

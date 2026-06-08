@@ -1,10 +1,13 @@
 package net.micode.notes.tool;
 
 import android.util.Log;
+import net.micode.notes.BuildConfig;
 import okhttp3.*;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class AiApiHelper {
     private static final String TAG = "AiApiHelper";
@@ -21,8 +24,15 @@ public class AiApiHelper {
         return sInstance;
     }
 
+//考虑到 AI 模型响应可能较慢（需要网络请求和 AI 处理时间），
+//将连接、读取、写入超时时间均设置为 60 秒，避免请求过早超时
     private AiApiHelper() {
-        client = new OkHttpClient();
+        // AI responses can be slow, so we increase timeouts to 60 seconds
+        client = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
     }
 
     public interface AiCallback {
@@ -40,11 +50,10 @@ public class AiApiHelper {
             msg.put("content", userText);
             messages.put(msg);
             json.put("messages", messages);
-            json.put("stream", false); // 关闭流式返回，简化处理
+            json.put("stream", false);
 
-            RequestBody body = RequestBody.create(
-                json.toString(), MediaType.parse("application/json; charset=utf-8")
-            );
+            MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+            RequestBody body = RequestBody.create(mediaType, json.toString());
 
             Request request = new Request.Builder()
                 .url(API_URL)
@@ -55,23 +64,40 @@ public class AiApiHelper {
 
             client.newCall(request).enqueue(new Callback() {
                 @Override public void onFailure(Call call, IOException e) {
-                    callback.onError("网络请求失败: " + e.getMessage());
+                    Log.e(TAG, "Request failed: " + e.getMessage());
+                    callback.onError(e.getMessage());
                 }
+
                 @Override public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful() && response.body() != null) {
-                        String resBody = response.body().string();
-                        JSONObject resJson = new JSONObject(resBody);
-                        String content = resJson.getJSONArray("choices")
-                            .getJSONObject(0).getJSONObject("message")
-                            .getString("content");
-                        callback.onSuccess(content);
-                    } else {
-                        callback.onError("API 响应错误: " + response.code());
+                    try (ResponseBody responseBody = response.body()) {
+                        if (!response.isSuccessful()) {
+                            String errorMsg = "Unexpected code " + response;
+                            Log.e(TAG, errorMsg);
+                            callback.onError(errorMsg);
+                            return;
+                        }
+
+                        if (responseBody == null) {
+                            callback.onError("Empty response body");
+                            return;
+                        }
+
+                        String responseData = responseBody.string();
+                        JSONObject jsonResponse = new JSONObject(responseData);
+                        String result = jsonResponse.getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content");
+                        callback.onSuccess(result);
+                    } catch (JSONException e) {
+                        Log.e(TAG, "JSON parsing error: " + e.getMessage());
+                        callback.onError(e.getMessage());
                     }
                 }
             });
-        } catch (Exception e) {
-            callback.onError("参数构建异常: " + e.getMessage());
+        } catch (JSONException e) {
+            Log.e(TAG, "JSON construction error: " + e.getMessage());
+            callback.onError(e.getMessage());
         }
     }
 }

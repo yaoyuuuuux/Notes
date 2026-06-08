@@ -3,15 +3,27 @@ plugins {
 }
 
 android {
-    namespace 'net.micode.notes' // 替换成你的包名
+    namespace 'net.micode.notes'
     compileSdk 34
 
     defaultConfig {
-        applicationId "net.micode.notes" // 替换成你的包名
+        applicationId "net.micode.notes"
         minSdk 21
         targetSdk 34
         versionCode 1
         versionName "1.0"
+
+        // 读取 local.properties 中的 API Key
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        }
+        def apiKey = properties.getProperty('ZHIPU_API_KEY') ?: project.findProperty('ZHIPU_API_KEY') ?: ""
+        buildConfigField "String", "ZHIPU_API_KEY", "\"${apiKey}\""
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -20,10 +32,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    useLibrary'org.apache.http.legacy'
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }

@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
-
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-
+<!-- Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net) -->
 <FrameLayout
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -26,41 +11,85 @@
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/note_title"-->
+<!--            android:layout_width="fill_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:gravity="center_vertical"-->
+<!--            android:paddingLeft="10dp"-->
+<!--            android:paddingRight="10dp">-->
+
+
+<!--使用start/end替代left/right-->
         <LinearLayout
             android:id="@+id/note_title"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <!-- ... existing code ... -->
+
+
+<!--            <TextView-->
+<!--                android:id="@+id/tv_modified_date"-->
+<!--                android:layout_width="0dip"-->
+<!--                android:layout_height="127dp"-->
+<!--                android:layout_gravity="left|center_vertical"-->
+<!--                android:layout_marginRight="8dip"-->
+<!--                android:layout_weight="1"-->
+<!--                android:textAppearance="@style/TextAppearanceSecondaryItem" />-->
+            <!-- ... existing code ... -->
+
+            <!-- ... existing code ... -->
+
+            <!-- ... existing code ... -->
 
             <TextView
                 android:id="@+id/tv_modified_date"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
+                android:layout_width="223dp"
+                android:layout_height="56dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginEnd="8dip"
                 android:layout_weight="1"
-                android:layout_gravity="left|center_vertical"
-                android:layout_marginRight="8dip"
                 android:textAppearance="@style/TextAppearanceSecondaryItem" />
-
-            <ImageView
-                android:id="@+id/iv_alert_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/title_alert" />
 
             <TextView
                 android:id="@+id/tv_alert_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="2dip"
-                android:layout_marginRight="8dip"
+                android:layout_marginStart="2dip"
+                android:layout_marginEnd="8dip"
                 android:textAppearance="@style/TextAppearanceSecondaryItem" />
 
-            <ImageButton
+            <ImageView
+                android:id="@+id/btn_set_bg_color"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@drawable/bg_btn_set_color" />
+                android:layout_height="56dp"
+                android:layout_gravity="top|right"
+                android:background="@drawable/bg_color_btn_mask"
+                android:visibility="visible" />
+
+            <!-- ... existing code ... -->
+
+            <!-- AI Helper Button -->
+<!--修复按钮触摸区域太小+添加图标-->
+            <!-- ... existing code ... -->
+
+            <!-- AI Helper Button - 顶部快捷按钮 -->
+
+            <!-- ... existing code ... -->
+
+            <!--            <ImageButton-->
+<!--                android:id="@+id/btn_ai_helper_header"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:background="@drawable/bg_btn_set_color"-->
+<!--                android:contentDescription="AI Helper" />-->
         </LinearLayout>
 
         <LinearLayout
@@ -75,37 +104,83 @@
                 android:background="@drawable/bg_color_btn_mask" />
 
             <ScrollView
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="0dip"
-                android:layout_weight="1"
-                android:scrollbars="none"
-                android:overScrollMode="never"
                 android:layout_gravity="left|top"
-                android:fadingEdgeLength="0dip">
+                android:layout_weight="1"
+                android:fadingEdgeLength="0dip"
+                android:overScrollMode="never"
+                android:scrollbars="none">
 
                 <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+                    <!--                    缺少可访问性文本改正，添加hint文本-->
+                    <!--                    <net.micode.notes.ui.NoteEditText-->
+                    <!--                        android:id="@+id/note_edit_view"-->
+                    <!--                        android:layout_width="fill_parent"-->
+                    <!--                        android:layout_height="match_parent"-->
+                    <!--                        android:autoLink="all"-->
+                    <!--                        android:background="@null"-->
+                    <!--                        android:gravity="left|top"-->
+                    <!--                        android:lineSpacingMultiplier="1.2"-->
+                    <!--                        android:linksClickable="false"-->
+                    <!--                        android:minLines="12"-->
+                    <!--                        android:textAppearance="@style/TextAppearancePrimaryItem" />-->
+                    <!-- ... existing code ... -->
+
+                    <!-- ... existing code ... -->
+
+                    <ImageButton
+                        android:id="@+id/btn_ai_helper_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_btn_set_color"
+                        android:contentDescription="AI Helper"
+                        android:src="@drawable/ic_ai_helper_background"
+                        android:visibility="invisible" />
 
                     <net.micode.notes.ui.NoteEditText
                         android:id="@+id/note_edit_view"
                         android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="left|top"
-                        android:background="@null"
+                        android:layout_height="match_parent"
                         android:autoLink="all"
+                        android:background="@null"
+                        android:gravity="start|top"
+                        android:hint="@string/notelist_string_info"
+                        android:lineSpacingMultiplier="1.2"
                         android:linksClickable="false"
                         android:minLines="12"
-                        android:textAppearance="@style/TextAppearancePrimaryItem"
-                        android:lineSpacingMultiplier="1.2" />
+                        android:textAppearance="@style/TextAppearancePrimaryItem" />
 
                     <LinearLayout
                         android:id="@+id/note_edit_list"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:layout_marginLeft="-10dip"
+                        android:orientation="vertical"
                         android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/btn_ai_helper"
+                        android:layout_width="78dp"
+                        android:layout_height="73dp"
+                        android:layout_marginRight="10dp"
+                        android:contentDescription="AI Helper"
+                        android:src="@drawable/ic_ai_helper"
+                        android:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/iv_alert_icon"
+                        android:layout_width="63dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/title_alert"
+                        android:visibility="visible" />
+
                 </LinearLayout>
             </ScrollView>
 
@@ -115,13 +190,6 @@
                 android:background="@drawable/bg_color_btn_mask" />
         </LinearLayout>
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/btn_set_bg_color"
-        android:layout_height="43dip"
-        android:layout_width="wrap_content"
-        android:background="@drawable/bg_color_btn_mask"
-        android:layout_gravity="top|right" />
 
     <LinearLayout
         android:id="@+id/note_bg_color_selector"
@@ -136,104 +204,52 @@
         <FrameLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/iv_bg_yellow"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <ImageView
-                android:id="@+id/iv_bg_yellow_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginRight="5dip"
-                android:focusable="false"
-                android:visibility="gone"
-                android:src="@drawable/selected" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView android:id="@+id/iv_bg_yellow" android:layout_width="match_parent" android:layout_height="match_parent" />
+            <ImageView android:id="@+id/iv_bg_yellow_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
-
         <FrameLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/iv_bg_blue"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <ImageView
-                android:id="@+id/iv_bg_blue_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:focusable="false"
-                android:visibility="gone"
-                android:layout_marginRight="3dip"
-                android:src="@drawable/selected" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView android:id="@+id/iv_bg_blue" android:layout_width="match_parent" android:layout_height="match_parent" />
+            <ImageView android:id="@+id/iv_bg_blue_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
-
         <FrameLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/iv_bg_white"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <ImageView
-                android:id="@+id/iv_bg_white_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:focusable="false"
-                android:visibility="gone"
-                android:layout_marginRight="2dip"
-                android:src="@drawable/selected" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView android:id="@+id/iv_bg_white" android:layout_width="match_parent" android:layout_height="match_parent" />
+            <ImageView android:id="@+id/iv_bg_white_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
-
         <FrameLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/iv_bg_green"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <ImageView
-                android:id="@+id/iv_bg_green_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:focusable="false"
-                android:visibility="gone"
-                android:src="@drawable/selected" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView android:id="@+id/iv_bg_green" android:layout_width="match_parent" android:layout_height="match_parent" />
+            <ImageView android:id="@+id/iv_bg_green_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
-
         <FrameLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/iv_bg_red"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <ImageView
-                android:id="@+id/iv_bg_red_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:focusable="false"
-                android:visibility="gone"
-                android:src="@drawable/selected" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView android:id="@+id/iv_bg_red" android:layout_width="match_parent" android:layout_height="match_parent" />
+            <ImageView android:id="@+id/iv_bg_red_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
     </LinearLayout>
 
@@ -249,152 +265,60 @@
             android:id="@+id/ll_font_small"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/font_small"
-                    android:layout_marginBottom="5dip" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/menu_font_small"
-                    android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_gravity="center" android:gravity="center">
+                <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/font_small" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/menu_font_small" android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/iv_small_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginRight="6dip"
-                android:layout_marginBottom="-7dip"
-                android:focusable="false"
-                android:visibility="gone"
-                android:src="@drawable/selected" />
+            <ImageView android:id="@+id/iv_small_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/ll_font_normal"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/font_normal"
-                    android:layout_marginBottom="5dip" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/menu_font_normal"
-                    android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_gravity="center" android:gravity="center">
+                <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/font_normal" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/menu_font_normal" android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/iv_medium_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:focusable="false"
-                android:visibility="gone"
-                android:layout_marginRight="6dip"
-                android:layout_marginBottom="-7dip"
-                android:src="@drawable/selected" />
+            <ImageView android:id="@+id/iv_medium_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/ll_font_large"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/font_large"
-                    android:layout_marginBottom="5dip" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/menu_font_large"
-                    android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_gravity="center" android:gravity="center">
+                <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/font_large" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/menu_font_large" android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/iv_large_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:focusable="false"
-                android:visibility="gone"
-                android:layout_marginRight="6dip"
-                android:layout_marginBottom="-7dip"
-                android:src="@drawable/selected" />
+            <ImageView android:id="@+id/iv_large_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/ll_font_super"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/font_super"
-                    android:layout_marginBottom="5dip" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/menu_font_super"
-                    android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_gravity="center" android:gravity="center">
+                <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/font_super" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/menu_font_super" android:textAppearance="@style/TextAppearanceUnderMenuIcon" />
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/iv_super_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:focusable="false"
-                android:visibility="gone"
-                android:layout_marginRight="6dip"
-                android:layout_marginBottom="-7dip"
-                android:src="@drawable/selected" />
+            <ImageView android:id="@+id/iv_super_select" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|right" android:visibility="gone" android:src="@drawable/selected" />
         </FrameLayout>
     </LinearLayout>
 </FrameLayout>

@@ -49,6 +49,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -66,6 +67,7 @@ import net.micode.notes.ui.DateTimePickerDialog.OnDateTimeSetListener;
 import net.micode.notes.ui.NoteEditText.OnTextViewChangeListener;
 import net.micode.notes.widget.NoteWidgetProvider_2x;
 import net.micode.notes.widget.NoteWidgetProvider_4x;
+import net.micode.notes.tool.AiApiHelper;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -374,6 +376,56 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         mNoteHeaderHolder.tvAlertDate = (TextView) findViewById(R.id.tv_alert_date);
         mNoteHeaderHolder.ibSetBgColor = (ImageView) findViewById(R.id.btn_set_bg_color);
         mNoteHeaderHolder.ibSetBgColor.setOnClickListener(this);
+//        添加AI助手按钮初始化
+        
+        // 顶部AI按钮监听器
+        ImageButton btnAiHelperHeader = findViewById(R.id.btn_ai_helper_header);
+        btnAiHelperHeader.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = mNoteEditor.getText().toString();
+                if (text.isEmpty()) {
+                    Toast.makeText(NoteEditActivity.this, "请先输入内容", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                AiApiHelper.getInstance().sendPrompt("请优化或续写以下内容：" + text,
+                        new AiApiHelper.AiCallback() {
+                            @Override
+                            public void onSuccess(String result) {
+                                runOnUiThread(() -> mNoteEditor.append("\n\n✨ AI 建议：\n" + result));
+                            }
+                            @Override
+                            public void onError(String error) {
+                                runOnUiThread(() -> Toast.makeText(NoteEditActivity.this, error, Toast.LENGTH_LONG).show());
+                            }
+                        });
+            }
+        });
+        
+        // 底部AI按钮监听器（已存在）
+        ImageButton btnAiHelper = findViewById(R.id.btn_ai_helper);
+        btnAiHelper.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = mNoteEditor.getText().toString();
+                if (text.isEmpty()) {
+                    Toast.makeText(NoteEditActivity.this, "请先输入内容", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                AiApiHelper.getInstance().sendPrompt("请优化或续写以下内容：" + text,
+                        new AiApiHelper.AiCallback() {
+                            @Override
+                            public void onSuccess(String result) {
+                                runOnUiThread(() -> mNoteEditor.append("\n\n✨ AI 建议：\n" + result));
+                            }
+                            @Override
+                            public void onError(String error) {
+                                runOnUiThread(() -> Toast.makeText(NoteEditActivity.this, error, Toast.LENGTH_LONG).show());
+                            }
+                        });
+            }
+        });
         mNoteEditor = (EditText) findViewById(R.id.note_edit_view);
         mNoteEditorPanel = findViewById(R.id.sv_note_edit);
         mNoteBgColorSelector = findViewById(R.id.note_bg_color_selector);
@@ -545,27 +597,33 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         } else if (itemId == R.id.menu_delete_remind) {
             mWorkingNote.setAlertDate(0, false);
         }
-//        增加处理逻辑
-        case R.id.menu_ai_helper:
-    String text = mNoteEditor.getText().toString();
-    if (text.isEmpty()) {
-        Toast.makeText(this, "请先输入内容", Toast.LENGTH_SHORT).show();
+        // 【新增】AI助手功能 - 处理菜单项点击
+        else if (itemId == R.id.menu_ai_helper) {
+            String text = mNoteEditor.getText().toString();
+            if (text.isEmpty()) {
+                Toast.makeText(this, "请先输入内容", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            // 调用AI助手优化或续写笔记内容
+            AiApiHelper.getInstance().sendPrompt("请优化或续写以下内容：" + text,
+                    new AiApiHelper.AiCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            // 在主线程更新UI，追加AI建议
+                            runOnUiThread(() -> mNoteEditor.append("\n\n✨ AI 建议：\n" + result));
+                        }
+                        @Override
+                        public void onError(String error) {
+                            // 显示错误信息
+                            runOnUiThread(() -> Toast.makeText(NoteEditActivity.this, error, Toast.LENGTH_LONG).show());
+                        }
+                    });
+        }
+
         return true;
     }
 
-    AiApiHelper.getInstance().sendPrompt("请优化或续写以下内容：" + text,
-        new AiApiHelper.AiCallback() {
-            @Override public void onSuccess(String result) {
-                runOnUiThread(() -> mNoteEditor.append("\n\n✨ AI 建议：\n" + result));
-            }
-            @Override public void onError(String error) {
-                runOnUiThread(() -> Toast.makeText(NoteEditActivity.this, error, Toast.LENGTH_LONG).show());
-            }
-        });
-    break;
-
-        return true;
-    }
 
     private void setReminder() {
         DateTimePickerDialog d = new DateTimePickerDialog(this, System.currentTimeMillis());
