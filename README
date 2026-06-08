@@ -1,28 +1,177 @@
 [中文]
 
-1. MiCode便签是小米便签的社区开源版，由MIUI团队(www.miui.com) 发起并贡献第一批代码，遵循NOTICE文件所描述的开源协议，
-   今后为MiCode社区(www.micode.net) 拥有，并由社区发布和维护。
+# MiCode 便签 - 智能便签应用
 
-2. Bug反馈和跟踪，请访问Github,
-   https://github.com/MiCode/Notes/issues?sort=created&direction=desc&state=open
+## 项目简介
 
-3. 功能建议和综合讨论，请访问MiCode,
-   http://micode.net/forum.php?mod=forumdisplay&fid=38
+MiCode便签是小米便签的社区开源版，由MIUI团队(www.miui.com) 发起并贡献第一批代码，遵循NOTICE文件所描述的开源协议，今后为MiCode社区(www.micode.net) 拥有，并由社区发布和维护。
 
-4. 小米便签是由java和kotlin混合编写的Android项目，所以需要装java（+JDK，java的运行环境）,kotlin,Android的插件，这里前两者的插件在vscode内部就可以找到，Android（提供项目语法支持）的扩展及Android studio（安卓软件开发工具包）需要自己去外部网站下载，下好之后代码中提到的Android部分就不会爆红了
-   https://developer.android.com/studio
+本项目在原有便签功能基础上，集成了AI智能辅助功能，支持智能内容生成、文本优化、摘要提取等AI能力。
 
-5..idea文件是配置文件，res是资源文件夹（所有界面、颜色、图标、文字），src是Java/Kotlin源代码文件夹，build.gradle是项目构建文件夹（以来库、编译版本等）
+## 功能特性
 
+### 核心功能
+- 📝 便签创建、编辑、删除
+-  文件夹分类管理
+-  多种颜色主题选择
+-  便签提醒功能
+- 📱 桌面小部件支持
+- 🔍 便签搜索功能
+
+### AI智能辅助功能 ✨
+- 🤖 集成智谱GLM-4大模型AI助手
+- 💬 智能文本生成与优化
+- 📋 内容摘要提取
+- 🌐 多语言翻译
+-  创意灵感辅助
+- ⚡ 快速AI操作入口（顶部栏快捷按钮、底部工具栏主按钮）
+
+## 技术栈
+
+- **开发语言**: Java + Kotlin 混合开发
+- **开发工具**: Android Studio
+- **构建工具**: Gradle 8.2
+- **最低SDK**: Android 5.0 (API 21)
+- **目标SDK**: Android 14 (API 34)
+- **AI服务**: 智谱AI开放平台 GLM-4-Flash 模型
+- **网络框架**: OkHttp 3.14.9
+- **数据解析**: Gson 2.10.1
+- **UI支持**: AndroidX + Material Design
+
+## 环境配置
+
+### 必需工具
+1. **Java JDK** - Java开发环境
+2. **Android Studio** - 官方IDE
+   - 下载: https://developer.android.com/studio
+3. **Android SDK** - 通过Android Studio安装
+
+### AI功能配置
+使用AI助手功能需要配置智谱AI API Key：
+
+1. 在 [智谱AI开放平台](https://open.bigmodel.cn/) 注册并获取API Key
+2. 在项目根目录的 `local.properties` 文件中添加：properties ZHIPU_API_KEY=your_api_key_here
+3. API Key不会提交到Git仓库，确保安全性
+
+## 开发说明
+
+### 构建项目
+
+在Android Studio中打开项目
+Gradle会自动下载依赖并同步项目
+### 关键目录说明
+- `.idea/` - Android Studio配置文件
+- `res/` - 资源文件夹（布局、颜色、图标、字符串等）
+- `app/src/main/java/` - Java/Kotlin源代码
+- `build.gradle` - 项目构建配置（依赖库、编译版本等）
+
+## 最近主要更新
+
+### 2026年6月
+-  集成智谱AI GLM-4模型，实现智能辅助功能
+-  优化项目安全性和性能
+-  完善代码注释，移除过时API（如AsyncTask）
+-  修复数据层文档错误，减少警告
+- 📝 提升代码可读性和稳定性
+
+### 2026年3月
+-  完成NotesProvider、NotesListActivity、NoteEditActivity文档注释与优化
+-  改进过时工具类使用
+-  修改data层文档错误
+
+## 社区与支持
+
+### Bug反馈
+请访问GitHub Issues:
+https://github.com/MiCode/Notes/issues?sort=created&direction=desc&state=open
+
+### 功能建议与讨论
+请访问MiCode论坛:
+http://micode.net/forum.php?mod=forumdisplay&fid=38
+
+---
 
 [English]
 
-1. MiCode Notes is open source edition of XM notepad, it's first initiated and sponsored by MIUI team (www.miui.com).
-   It's opened under license described by NOTICE file. It's owned by the MiCode community (www.micode.net). In future,
-   the MiCode community will release and maintain this project.
+# MiCode Notes - Smart Note Taking App
 
-2. Regarding issue tracking, please visit Github,
-   https://github.com/MiCode/Notes/issues?sort=created&direction=desc&state=open
+## Overview
 
-3. Regarding feature request and general discussion, please visit Micode forum,
-   http://micode.net/forum.php?mod=forumdisplay&fid=38
+MiCode Notes is the open source edition of Xiaomi Notepad, first initiated and sponsored by MIUI team (www.miui.com). It's released under the license described in the NOTICE file. The project is owned and maintained by the MiCode community (www.micode.net).
+
+This project has been enhanced with AI-powered features, supporting intelligent content generation, text optimization, summary extraction, and more.
+
+## Features
+
+### Core Features
+- 📝 Create, edit, and delete notes
+- 📁 Folder organization
+- 🎨 Multiple color themes
+- ⏰ Note reminders and alarms
+- 📱 Home screen widgets
+-  Note search functionality
+
+### AI Smart Assistant ✨
+- 🤖 Powered by Zhipu AI GLM-4 Large Language Model
+- 💬 Smart text generation and optimization
+-  Content summarization
+- 🌐 Multi-language translation
+- 💡 Creative inspiration assistance
+-  Quick AI access (toolbar shortcuts and main button)
+
+## Tech Stack
+
+- **Languages**: Java + Kotlin
+- **IDE**: Android Studio
+- **Build Tool**: Gradle 8.2
+- **Min SDK**: Android 5.0 (API 21)
+- **Target SDK**: Android 14 (API 34)
+- **AI Service**: Zhipu AI GLM-4-Flash Model
+- **Networking**: OkHttp 3.14.9
+- **JSON Parsing**: Gson 2.10.1
+- **UI Framework**: AndroidX + Material Design
+
+## Setup
+
+### Prerequisites
+1. **Java JDK** - Java Development Kit
+2. **Android Studio** - Official IDE
+   - Download: https://developer.android.com/studio
+3. **Android SDK** - Installed via Android Studio
+
+### AI Feature Configuration
+To use AI features, configure your Zhipu AI API Key:
+
+1. Register and get API Key at [Zhipu AI Platform](https://open.bigmodel.cn/)
+2. Add to `local.properties` in project root:properties ZHIPU_API_KEY=your_api_key_here
+3. API Key is not committed to Git for security
+
+
+## Recent Updates
+
+### June 2026
+- ✨ Integrated Zhipu AI GLM-4 model for smart assistance
+- 🔧 Optimized security and performance
+- 📚 Enhanced code documentation, removed deprecated APIs (AsyncTask)
+- 🐛 Fixed data layer documentation errors, reduced warnings
+- 📝 Improved code readability and stability
+
+### March 2026
+- 📝 Completed documentation for NotesProvider, NotesListActivity, NoteEditActivity
+-  Updated deprecated utility usage
+- 📚 Fixed data layer documentation issues
+
+## Community & Support
+
+### Bug Reports
+GitHub Issues:
+https://github.com/MiCode/Notes/issues?sort=created&direction=desc&state=open
+
+### Feature Requests & Discussion
+MiCode Forum:
+http://micode.net/forum.php?mod=forumdisplay&fid=38
+
+
+
+
+
